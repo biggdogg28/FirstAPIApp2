@@ -21,5 +21,29 @@ namespace FirstAPIApp2.Repositories
         {
             return await _context.Announcements.ToListAsync();
         }
+
+        public async Task<Announcement> GetAnnouncementByIdAsync(Guid id)
+        {
+            return await _context.Announcements.SingleOrDefaultAsync(a => a.IDAnnouncement == id);
+        }
+
+        public async Task CreateAnnouncementAsync(Announcement announcement)
+        {
+            announcement.IDAnnouncement = Guid.NewGuid();
+            _context.Announcements.Add(announcement);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteAnnouncementAsync(Guid id)
+        {
+            Announcement announcement = await GetAnnouncementByIdAsync(id);
+            if (announcement == null) 
+            {
+                return false;
+            }
+            _context.Announcements.Remove(announcement);
+            _context.SaveChanges();
+            return true;
+        }
     }
 }

@@ -1,4 +1,7 @@
-﻿using FirstAPIApp2.Services;
+﻿using FirstAPIApp2.DTOs;
+using FirstAPIApp2.Helpers;
+using FirstAPIApp2.Models;
+using FirstAPIApp2.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -27,9 +30,9 @@ namespace FirstAPIApp2.Controllers
 
                 var announcements = await _announcementsService.GetAnnouncementsAsync();
 
-                if(announcements == null || !announcements.Any())
+                if (announcements == null || !announcements.Any())
                 {
-                    return StatusCode((int)HttpStatusCode.NoContent, "No element");
+                    return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);
                 }
 
                 return Ok(announcements);
@@ -41,5 +44,70 @@ namespace FirstAPIApp2.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAnnouncementAsync([FromRoute] Guid id)
+        {
+            try
+            {
+                _logger.LogInformation("GetAccouncementById stareted");
+                var announcement = await _announcementsService.GetAnnouncementByIdAsync(id);
+                if (announcement == null)
+                {
+                    return NotFound(ErrorMessagesEnum.NoElementFound);
+                }
+                return Ok(announcement);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"GetAnnouncementById error: {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostAnnouncementAsync([FromBody] Announcement announcement)
+        {
+            try
+            {
+                _logger.LogInformation("CreateAnnouncementAsync started.");
+                if (announcement == null)
+                {
+                    return BadRequest(ErrorMessagesEnum.BadRequest);
+                }
+                await _announcementsService.CreateAnnouncementAsync(announcement);
+                return Ok(SuccessMessagesEnum.ElementSuccessfullyAdded);
+
+            }
+            catch (ModelValidationException ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAnnouncementAsync([FromRoute] Guid id)
+        {
+            try
+            {
+                _logger.LogInformation("Delete Announcment Started");
+                bool result = await _announcementsService.DeleteAnnouncementAsync(id);
+                if(result)
+                {
+                    return Ok(SuccessMessagesEnum.ElementSuccessfullyDeleted);
+                }
+                return BadRequest(ErrorMessagesEnum.NoElementFound);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

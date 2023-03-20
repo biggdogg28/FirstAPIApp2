@@ -12,7 +12,7 @@ namespace FirstAPIApp2.DataContext
         //public DbSet<CodeSnippet> CodeSnippets { get; set; }
         //public DbSet<Member> Members { get; set; }
         //public DbSet<Membership> Memberships { get; set; }
-        //public DbSet<MembershipType> MembershipTypes { get; set; }
+        //public DbSet<MembershipType> MembershipTypes { get; set; } - Create Services DTOs and Controllers
 
     }
 }
