@@ -1,5 +1,6 @@
 ﻿using FirstAPIApp2.DTOs;
 using FirstAPIApp2.DTOs.CreateUpdateObjects;
+using FirstAPIApp2.DTOs.PatchObjects;
 using FirstAPIApp2.Helpers;
 using FirstAPIApp2.Models;
 using FirstAPIApp2.Services;
@@ -145,7 +146,7 @@ namespace FirstAPIApp2.Controllers
         // patch should not use objects which are labled as required
         // there should be 3 separate objects: one for Get, one for CreateUpdate and one for Patch
         [HttpPatch("{id}")]
-        public async Task<IActionResult> PatchAnnouncement([FromRoute] Guid id, [FromBody] CreateUpdateAnnouncement announcement)
+        public async Task<IActionResult> PatchAnnouncement([FromRoute] Guid id, [FromBody] PatchAnnouncement announcement)
         {
             try
             {
@@ -155,7 +156,7 @@ namespace FirstAPIApp2.Controllers
                     return BadRequest(ErrorMessagesEnum.BadRequest);
                 }
 
-                CreateUpdateAnnouncement updatedAnnouncement = await _announcementsService.UpdatePartiallyAnnouncementAsync(id, announcement);
+                PatchAnnouncement updatedAnnouncement = await _announcementsService.UpdatePartiallyAnnouncementAsync(id, announcement);
                 if (updatedAnnouncement == null)
                 {
                     return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);

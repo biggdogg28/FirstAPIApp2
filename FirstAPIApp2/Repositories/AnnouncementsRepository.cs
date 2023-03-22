@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using FirstAPIApp2.DTOs.CreateUpdateObjects;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using AutoMapper;
+using FirstAPIApp2.DTOs.PatchObjects;
 
 namespace FirstAPIApp2.Repositories
 {
@@ -81,7 +82,7 @@ namespace FirstAPIApp2.Repositories
             return await _context.Announcements.CountAsync(a => a.IDAnnouncement == id) > 0;
         }
 
-        public async Task<CreateUpdateAnnouncement> UpdatePartiallyAnnouncementAsync(Guid id, CreateUpdateAnnouncement announcement)
+        public async Task<PatchAnnouncement> UpdatePartiallyAnnouncementAsync(Guid id, PatchAnnouncement announcement)
         {
             var announcementFromDb = await GetAnnouncementByIdAsync(id);
 
@@ -90,27 +91,27 @@ namespace FirstAPIApp2.Repositories
                 return null;
             }
 
-            if(!string.IsNullOrEmpty(announcement.Title) && announcement.Title != announcement.Title) 
+            if(!string.IsNullOrEmpty(announcement.Title) && announcement.Title != announcementFromDb.Title) 
             {
                 announcementFromDb.Title = announcement.Title;
             }
-            if (!string.IsNullOrEmpty(announcement.Text) && announcement.Text != announcement.Title)
+            if (!string.IsNullOrEmpty(announcement.Text) && announcement.Text != announcementFromDb.Title)
             {
                 announcementFromDb.Text = announcement.Text;
             }
-            if (!string.IsNullOrEmpty(announcement.Tags) && announcement.Tags != announcement.Tags)
+            if (!string.IsNullOrEmpty(announcement.Tags) && announcement.Tags != announcementFromDb.Tags)
             {
                 announcementFromDb.Tags = announcement.Tags;
             }
-            if (announcement.ValidFrom.HasValue && announcement.ValidFrom != announcement.ValidFrom)
+            if (announcement.ValidFrom.HasValue && announcement.ValidFrom != announcementFromDb.ValidFrom)
             {
                 announcementFromDb.ValidFrom = announcement.ValidFrom;
             }
-            if (announcement.ValidTo.HasValue && announcement.ValidTo != announcement.ValidTo)
+            if (announcement.ValidTo.HasValue && announcement.ValidTo != announcementFromDb.ValidTo)
             {
                 announcementFromDb.ValidTo = announcement.ValidTo;
             }
-            if (announcement.EventDate.HasValue && announcement.EventDate != announcement.EventDate)
+            if (announcement.EventDate.HasValue && announcement.EventDate != announcementFromDb.EventDate)
             {
                 announcementFromDb.EventDate = announcement.EventDate;
             }

@@ -1,5 +1,6 @@
 ﻿using FirstAPIApp2.DTOs;
 using FirstAPIApp2.DTOs.CreateUpdateObjects;
+using FirstAPIApp2.DTOs.PatchObjects;
 
 namespace FirstAPIApp2.Services
 {
@@ -10,6 +11,6 @@ namespace FirstAPIApp2.Services
         public Task CreateAnnouncementAsync(Announcement newAnnouncement);
         public Task<bool> DeleteAnnouncementAsync(Guid id);
         public Task<CreateUpdateAnnouncement> UpdateAnnouncementAsync(Guid id, CreateUpdateAnnouncement announcement);
-        public Task<CreateUpdateAnnouncement> UpdatePartiallyAnnouncementAsync(Guid id, CreateUpdateAnnouncement announcement);
+        public Task<PatchAnnouncement> UpdatePartiallyAnnouncementAsync(Guid id, PatchAnnouncement announcement);
     }
 }

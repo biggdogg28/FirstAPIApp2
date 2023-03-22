@@ -1,5 +1,6 @@
 ﻿using FirstAPIApp2.DTOs;
 using FirstAPIApp2.DTOs.CreateUpdateObjects;
+using FirstAPIApp2.DTOs.PatchObjects;
 using FirstAPIApp2.Helpers;
 using FirstAPIApp2.Repositories;
 
@@ -44,7 +45,7 @@ namespace FirstAPIApp2.Services
             return await _repository.UpdateAnnouncementAsync(id, announcement);
         }
 
-        public async Task<CreateUpdateAnnouncement> UpdatePartiallyAnnouncementAsync(Guid id, CreateUpdateAnnouncement announcement)
+        public async Task<PatchAnnouncement> UpdatePartiallyAnnouncementAsync(Guid id, PatchAnnouncement announcement)
         {
             ValidationFunctions.ExceptionWhenDateIsNotValid(announcement.ValidFrom, announcement.ValidTo);
 
