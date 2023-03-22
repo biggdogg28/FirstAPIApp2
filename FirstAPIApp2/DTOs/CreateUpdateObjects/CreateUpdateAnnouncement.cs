@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
-namespace FirstAPIApp2.DTOs
+namespace FirstAPIApp2.DTOs.CreateUpdateObjects
 {
-    public class Announcement
+    // Create a minimal model
+    // The JsonIgnore will ignore the ID before sending the body for update
+    public class CreateUpdateAnnouncement
     {
         [Key]
+        [JsonIgnore]
         public Guid IDAnnouncement { get; set; }
         [Required(ErrorMessage = "This field is mandatory.")]
         public DateTime? ValidFrom { get; set; }

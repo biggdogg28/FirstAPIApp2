@@ -17,6 +17,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 
 builder.Services.AddTransient<IAnnouncementsRepository, AnnouncementsRepository>();
 builder.Services.AddTransient<IAnnouncementsService, AnnouncementsService>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // build for the app is done only after all services are registered
 var app = builder.Build();

@@ -1,4 +1,5 @@
 ﻿using FirstAPIApp2.DTOs;
+using FirstAPIApp2.DTOs.CreateUpdateObjects;
 using FirstAPIApp2.Helpers;
 using FirstAPIApp2.Repositories;
 
@@ -34,6 +35,20 @@ namespace FirstAPIApp2.Services
         public async Task<bool> DeleteAnnouncementAsync(Guid id)
         {
             return await _repository.DeleteAnnouncementAsync(id);
+        }
+
+        public async Task<CreateUpdateAnnouncement> UpdateAnnouncementAsync(Guid id, CreateUpdateAnnouncement announcement)
+        {
+            ValidationFunctions.ExceptionWhenDateIsNotValid(announcement.ValidFrom, announcement.ValidTo);
+
+            return await _repository.UpdateAnnouncementAsync(id, announcement);
+        }
+
+        public async Task<CreateUpdateAnnouncement> UpdatePartiallyAnnouncementAsync(Guid id, CreateUpdateAnnouncement announcement)
+        {
+            ValidationFunctions.ExceptionWhenDateIsNotValid(announcement.ValidFrom, announcement.ValidTo);
+
+            return await _repository.UpdatePartiallyAnnouncementAsync(id, announcement);
         }
     }
 }

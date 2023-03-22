@@ -1,6 +1,9 @@
 ﻿using FirstAPIApp2.DTOs;
 using FirstAPIApp2.DataContext;
 using Microsoft.EntityFrameworkCore;
+using FirstAPIApp2.DTOs.CreateUpdateObjects;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using AutoMapper;
 
 namespace FirstAPIApp2.Repositories
 {
@@ -12,9 +15,12 @@ namespace FirstAPIApp2.Repositories
 
         //readonly -> runtime, value needs to be assgined in the constructor
 
-        public AnnouncementsRepository(ProgrammingClubDataContext context)
+        private readonly IMapper _mapper;
+
+        public AnnouncementsRepository(ProgrammingClubDataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Announcement>> GetAnnouncementsAsync()
@@ -37,13 +43,81 @@ namespace FirstAPIApp2.Repositories
         public async Task<bool> DeleteAnnouncementAsync(Guid id)
         {
             Announcement announcement = await GetAnnouncementByIdAsync(id);
-            if (announcement == null) 
+            if (announcement == null)
             {
                 return false;
             }
             _context.Announcements.Remove(announcement);
             _context.SaveChanges();
             return true;
+        }
+
+        public async Task<CreateUpdateAnnouncement> UpdateAnnouncementAsync(Guid id, CreateUpdateAnnouncement announcement)
+        {
+            if (!await ExistAnnouncementAsync(id))
+            {
+                return null;
+            }
+
+            // oldfashioned way, instead use IMapper!!!
+            //announcementFromDb.IDAnnouncement = id;
+            //announcementFromDb.EventDate = announcement.EventDate;
+            //announcementFromDb.Text = announcement.Text;
+            //announcementFromDb.Title = announcement.Title;
+            //announcementFromDb.ValidFrom = announcement.ValidFrom;
+            //announcementFromDb.ValidTo = announcement.ValidTo;
+            //announcementFromDb.Tags = announcement.Tags;
+
+            var announcementUpdated = _mapper.Map<Announcement>(announcement);
+            announcementUpdated.IDAnnouncement = id;
+
+            _context.Announcements.Update(announcementUpdated);
+            await _context.SaveChangesAsync();
+            return announcement;
+        }
+
+        private async Task<bool> ExistAnnouncementAsync(Guid id)
+        {
+            return await _context.Announcements.CountAsync(a => a.IDAnnouncement == id) > 0;
+        }
+
+        public async Task<CreateUpdateAnnouncement> UpdatePartiallyAnnouncementAsync(Guid id, CreateUpdateAnnouncement announcement)
+        {
+            var announcementFromDb = await GetAnnouncementByIdAsync(id);
+
+            if (announcementFromDb == null)
+            {
+                return null;
+            }
+
+            if(!string.IsNullOrEmpty(announcement.Title) && announcement.Title != announcement.Title) 
+            {
+                announcementFromDb.Title = announcement.Title;
+            }
+            if (!string.IsNullOrEmpty(announcement.Text) && announcement.Text != announcement.Title)
+            {
+                announcementFromDb.Text = announcement.Text;
+            }
+            if (!string.IsNullOrEmpty(announcement.Tags) && announcement.Tags != announcement.Tags)
+            {
+                announcementFromDb.Tags = announcement.Tags;
+            }
+            if (announcement.ValidFrom.HasValue && announcement.ValidFrom != announcement.ValidFrom)
+            {
+                announcementFromDb.ValidFrom = announcement.ValidFrom;
+            }
+            if (announcement.ValidTo.HasValue && announcement.ValidTo != announcement.ValidTo)
+            {
+                announcementFromDb.ValidTo = announcement.ValidTo;
+            }
+            if (announcement.EventDate.HasValue && announcement.EventDate != announcement.EventDate)
+            {
+                announcementFromDb.EventDate = announcement.EventDate;
+            }
+
+            _context.Announcements.Update(announcementFromDb);
+            await _context.SaveChangesAsync();
+            return announcement;
         }
     }
 }

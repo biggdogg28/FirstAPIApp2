@@ -1,4 +1,5 @@
 ﻿using FirstAPIApp2.DTOs;
+using FirstAPIApp2.DTOs.CreateUpdateObjects;
 using FirstAPIApp2.Helpers;
 using FirstAPIApp2.Models;
 using FirstAPIApp2.Services;
@@ -97,11 +98,75 @@ namespace FirstAPIApp2.Controllers
             {
                 _logger.LogInformation("Delete Announcment Started");
                 bool result = await _announcementsService.DeleteAnnouncementAsync(id);
-                if(result)
+                if (result)
                 {
                     return Ok(SuccessMessagesEnum.ElementSuccessfullyDeleted);
                 }
                 return BadRequest(ErrorMessagesEnum.NoElementFound);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAnnouncement([FromRoute] Guid id, [FromBody] CreateUpdateAnnouncement announcement)
+        {
+            try
+            {
+                _logger.LogInformation("Update started");
+                if(announcement == null)
+                {
+                    return BadRequest(ErrorMessagesEnum.BadRequest);
+                }
+
+                CreateUpdateAnnouncement updatedAnnouncement = await _announcementsService.UpdateAnnouncementAsync(id, announcement);
+                if (updatedAnnouncement == null)
+                {
+                    return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);
+                }
+                return Ok(SuccessMessagesEnum.ElementSuccessfullyUpdated);
+
+            }
+            catch (ModelValidationException ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        // patch should not use objects which are labled as required
+        // there should be 3 separate objects: one for Get, one for CreateUpdate and one for Patch
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchAnnouncement([FromRoute] Guid id, [FromBody] CreateUpdateAnnouncement announcement)
+        {
+            try
+            {
+                _logger.LogInformation("Update started");
+                if (announcement == null)
+                {
+                    return BadRequest(ErrorMessagesEnum.BadRequest);
+                }
+
+                CreateUpdateAnnouncement updatedAnnouncement = await _announcementsService.UpdatePartiallyAnnouncementAsync(id, announcement);
+                if (updatedAnnouncement == null)
+                {
+                    return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);
+                }
+                return Ok(SuccessMessagesEnum.ElementSuccessfullyUpdated);
+
+            }
+            catch (ModelValidationException ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
